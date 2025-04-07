@@ -13,7 +13,7 @@
 
 CLIENTIPSTART="10.234.107.1"
 export CLIENTIPSTART
-
+current_dir=`pwd`
 generateinterface() {
     local IFS=.
  
@@ -577,6 +577,8 @@ show_config() {
 		echo "Port: $proto_text/$port_text"
 		echo "Client name: $client_text"
 		echo "Client DNS: $dns_text"
+		echo "Client P2P: $P2PIPPREFIXSTART.0/24"
+		echo "Client Start IP: $CLIENTIPSTART"
 	fi
 }
 
@@ -1650,8 +1652,9 @@ ovpnsetup "$@"
 CLIENTIPSTART_FROM_OPENVPN="CLIENTIPSTART='${CLIENTIPSTART}'"
 CLIENTIPQTY_FROM_OPENVPN="CLIENTIPQTY=${CLIENTIPQTY}"
 
-sed -i "s/#CLIENTIPSTART_FROM_OPENVPN/${CLIENTIPSTART_FROM_OPENVPN}\n#CLIENTIPSTART_FROM_OPENVPN/g" "${export_dir}ovpntovyos.sh"
-sed -i "s/#CLIENTIPQTY_FROM_OPENVPN/${CLIENTIPQTY_FROM_OPENVPN}\n#CLIENTIPQTY_FROM_OPENVPN/g" "${export_dir}ovpntovyos.sh"
+echo $current_dir
+sed -i "s/#CLIENTIPSTART_FROM_OPENVPN/${CLIENTIPSTART_FROM_OPENVPN}\n#CLIENTIPSTART_FROM_OPENVPN/g" "${current_dir}/ovpntovyos.sh"
+sed -i "s/#CLIENTIPQTY_FROM_OPENVPN/${CLIENTIPQTY_FROM_OPENVPN}\n#CLIENTIPQTY_FROM_OPENVPN/g" "${current_dir}/ovpntovyos.sh"
 
 
 #srctopublic
