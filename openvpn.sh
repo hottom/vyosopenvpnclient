@@ -11,8 +11,8 @@
 # Released under the MIT License, see the accompanying file LICENSE.txt
 # or https://opensource.org/licenses/MIT
 
-CLIENTIPSTART="10.234.107.1"
-export CLIENTIPSTART
+#CLIENTIPSTART="10.234.107.1"
+#export CLIENTIPSTART
 current_dir=`pwd`
 generateinterface() {
     local IFS=.
@@ -185,6 +185,12 @@ parse_args() {
 				shift
 				shift
 				;;
+			--clientstartipaddr)
+				CLIENTIPSTART="$2"
+				export CLIENTIPSTART
+				shift
+				shift
+				;;
 			--dns1)
 				dns1="$2"
 				shift
@@ -210,6 +216,8 @@ parse_args() {
 }
 
 check_args() {
+
+
 	if [ "$auto" != 0 ] && [ -e "$OVPN_CONF" ]; then
 		show_usage "Invalid parameter '--auto'. OpenVPN is already set up on this server."
 	fi
@@ -228,6 +236,13 @@ check_args() {
 		[ "$list_clients" = 1 ] && exiterr "$st_text listing clients."
 		[ "$revoke_client" = 1 ] && exiterr "$st_text revoking a client."
 		[ "$remove_ovpn" = 1 ] && exiterr "Cannot remove OpenVPN because it has not been set up on this server."
+		#CLIENTIPSTART
+		if [ -z "$CLIENTIPSTART" ] ; then
+			exiterr "Invalid client start ip address. Cannot be none -10000."
+		fi  
+		if ! check_ip "$CLIENTIPSTART"; then
+			exiterr "client start ip address Invalid . Must be an  private IPv4 address."
+		fi
 	fi
 	if [ "$((add_client + export_client + revoke_client))" = 1 ] && [ -n "$first_client_name" ]; then
 		show_usage "Invalid parameters. '--clientname' can only be specified when installing OpenVPN."
@@ -270,6 +285,7 @@ check_args() {
 			exiterr "Invalid client name. Use one word only, no special characters except '-' and '_'."
 		fi
 	fi
+
 	if [ -n "$server_proto" ]; then
 		case "$server_proto" in
 			[tT][cC][pP])
@@ -1430,7 +1446,7 @@ print_ovpn_removed() {
 	echo
 	echo "OpenVPN removed!"
 	echo "Next time cmd"
-	echo "./openvpn.sh --auto --proto TCP --port 8080 --clientname sokan"
+	echo "./openvpn.sh --auto --proto TCP --port 8080 --clientname sokan --clientstartipaddr 10.234.107.1"
 }
 
 print_ovpn_removal_aborted() {
@@ -1442,7 +1458,7 @@ ovpnsetup() {
 
 export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 
-generateinterface
+
 check_root
 check_shell
 check_kernel
@@ -1465,6 +1481,7 @@ server_addr=""
 server_proto=""
 server_port=""
 first_client_name=""
+CLIENTIPSTART=""
 unsanitized_client=""
 client=""
 dns=""
@@ -1473,6 +1490,8 @@ dns2=""
 
 parse_args "$@"
 check_args
+
+generateinterface
 
 if [ "$add_client" = 1 ]; then
 	show_header
@@ -1660,4 +1679,4 @@ sed -i "s/#CLIENTIPQTY_FROM_OPENVPN/${CLIENTIPQTY_FROM_OPENVPN}\n#CLIENTIPQTY_FR
 #srctopublic
 exit 0
 #cmd 
-#./openvpn.sh --auto --proto TCP --port 8080 --clientname sokan
+#./openvpn.sh --auto --proto TCP --port 8080 --clientname sokan --clientstartipaddr 10.234.107.1
