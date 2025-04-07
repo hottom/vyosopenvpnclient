@@ -218,7 +218,7 @@ generateroure() {
           ((count++))
         done
     fi
-    echo -e $vyosresult
+    echo -e $vyosresult >>  "vyos${interefaceID}.conf"
 }
 
   
@@ -244,7 +244,7 @@ generatedeleteconf() {
     script="delete pki openvpn shared-secret client-${interefaceID}\n"
     vyosdelete="${vyosdelete}\n${script}"
 
-    echo -e $vyosdelete
+    echo -e $vyosdelete >>  "vyos${interefaceID}.conf"
 }
 
 
